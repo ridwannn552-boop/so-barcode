@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Opname Barcode</title>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            width: 90%;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<h2>📦 STOCK OPNAME SCAN</h2>
+
+<div id="reader"></div>
+
+<input type="text" id="barcode" placeholder="Barcode">
+<input type="number" id="qty" placeholder="Qty">
+
+<button onclick="saveData()">Simpan</button>
+<button onclick="exportExcel()">Export Excel</button>
+
+<table border="1" id="table">
+    <tr>
+        <th>Barcode</th>
+        <th>Qty</th>
+    </tr>
+</table>
+
+<script>
+
+let data = [];
+
+function onScanSuccess(decodedText) {
+    document.getElementById('barcode').value = decodedText;
+}
+
+let scanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250
+});
+
+scanner.render(onScanSuccess);
+
+function saveData() {
+
+    let barcode = document.getElementById('barcode').value;
+    let qty = document.getElementById('qty').value;
+
+    if (!barcode || !qty) {
+        alert("Isi dulu");
+        return;
+    }
+
+    data.push({barcode, qty});
+
+    let table = document.getElementById('table');
+
+    let row = table.insertRow();
+
+    row.insertCell(0).innerHTML = barcode;
+    row.insertCell(1).innerHTML = qty;
+
+    document.getElementById('barcode').value = "";
+    document.getElementById('qty').value = "";
+
+}
+
+function exportExcel() {
+
+    let ws = XLSX.utils.json_to_sheet(data);
+
+    let wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "SO");
+
+    XLSX.writeFile(wb, "StockOpname.xlsx");
+
+}
+
+</script>
+
+</body>
+</html>
