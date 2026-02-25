@@ -58,8 +58,6 @@
 
 <div id="reader"></div>
 
-<br>
-
 <input type="text" id="barcode" placeholder="Barcode">
 <input type="number" id="qty" placeholder="Qty">
 
@@ -85,8 +83,17 @@ function onScanSuccess(decodedText) {
 let html5QrCode = new Html5Qrcode("reader");
 
 Html5Qrcode.getCameras().then(devices => {
+
     if (devices && devices.length) {
-        let cameraId = devices[0].id;
+
+        // Cari kamera belakang
+        let backCamera = devices.find(device =>
+            device.label.toLowerCase().includes('back') ||
+            device.label.toLowerCase().includes('rear')
+        );
+
+        let cameraId = backCamera ? backCamera.id : devices[0].id;
+
         html5QrCode.start(
             cameraId,
             {
@@ -96,6 +103,7 @@ Html5Qrcode.getCameras().then(devices => {
             onScanSuccess
         );
     }
+
 }).catch(err => {
     alert("Kamera tidak ditemukan / izin ditolak");
 });
